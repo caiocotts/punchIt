@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
@@ -11,6 +12,7 @@ class RegistrationScreen extends StatefulWidget {
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
   late String newEmail = '', newPassword = '', retypedPassword = '';
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +58,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             Builder(builder: (context) {
               return TextButton(
                 onPressed: () async {
+                  final User? user = auth.currentUser;
                   if (retypedPassword != newPassword) {
                     SnackBar snackBar = const SnackBar(
                       content: Text("Passwords do not match"),
@@ -79,6 +82,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     setState(() {});
                     return;
                   }
+                  FirebaseFirestore.instance
+                      .collection("users")
+                      .doc(user?.uid)
+                      .set({
+                    "email": user?.email,
+                  }).catchError((e) {
+                    SnackBar snackBar = SnackBar(
+                      content: Text(
+                        e.toString().replaceAll(RegExp(r'\[.*\]'), ''),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    setState(() {});
+                    return;
+                  });
                   Navigator.push(
                     context,
                     MaterialPageRoute(

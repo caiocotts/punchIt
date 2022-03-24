@@ -33,16 +33,14 @@ class _CreateGroupState extends State<CreateGroup> {
               return TextButton(
                 onPressed: () async {
                   final User? user = auth.currentUser;
-                  final uid = user?.uid;
                   // print(newGroupName);
                   // print(uid);
                   FirebaseFirestore.instance
                       .collection("users")
-                      .doc(uid)
+                      .doc(user?.uid)
                       .collection("groups")
-                      .doc(newGroupName)
-                      .set({
-                        "id": "1234",
+                      .add({
+                        "groupName": newGroupName,
                       })
                       .then(
                         (_) => Navigator.push(

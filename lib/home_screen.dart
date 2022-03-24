@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:punch_it/create_group_screen.dart';
+import 'package:punch_it/joined_groups_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -32,14 +33,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Text("Create a Group"),
                   );
                 }),
-                const TextButton(
-                  onPressed: null,
-                  child: Text("View Groups"),
-                ),
-                const TextButton(
-                  onPressed: null,
-                  child: Text("Joined Groups"),
-                )
+                // const TextButton(
+                //   onPressed: null,
+                //   child: Text("View Groups"),
+                // ),
+                Builder(builder: (context) {
+                  return TextButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const JoinedGroups(),
+                      ),
+                    ),
+                    child: const Text("Joined Groups"),
+                  );
+                })
               ],
             )
           ],
