@@ -14,6 +14,8 @@ class _CreateGroupState extends State<CreateGroup> {
   String newGroupName = '', groupDescription = '';
   final FirebaseAuth auth = FirebaseAuth.instance;
 
+  // late DocumentReference groupInfo;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,35 +34,38 @@ class _CreateGroupState extends State<CreateGroup> {
             Builder(builder: (context) {
               return TextButton(
                 onPressed: () async {
-                  final User? user = auth.currentUser;
-                  // print(newGroupName);
-                  // print(uid);
-                  FirebaseFirestore.instance
-                      .collection("users")
-                      .doc(user?.uid)
+                  DocumentReference docRef = await FirebaseFirestore.instance
                       .collection("groups")
                       .add({
-                        "groupName": newGroupName,
-                      })
-                      .then(
-                        (_) => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const HomeScreen(),
-                          ),
+                    "name": newGroupName,
+                  });
+                  String? uid = auth.currentUser?.uid;
+                  FirebaseFirestore.instance
+                      .collection("junction_user_group")
+                      .doc(uid! + docRef.id)
+                      .set({
+                    "groupId": docRef.id,
+                    "uid": uid,
+                  }).then(
+                        (_) {
+                      return Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HomeScreen(),
                         ),
-                      )
-                      .catchError((e) {
-                        SnackBar snackBar = SnackBar(
-                          content: Text(
-                            e.toString().replaceAll(RegExp(r'\[.*\]'), ''),
-                          ),
-                          backgroundColor: Colors.redAccent,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        setState(() {});
-                        return;
-                      });
+                      );
+                    },
+                  ).catchError((e) {
+                    SnackBar snackBar = SnackBar(
+                      content: Text(
+                        e.toString().replaceAll(RegExp(r'\[.*\]'), ''),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    setState(() {});
+                    return;
+                  });
                 },
                 child: const Text("Create"),
               );

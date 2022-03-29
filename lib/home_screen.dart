@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:punch_it/create_group_screen.dart';
 import 'package:punch_it/joined_groups_screen.dart';
@@ -13,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    // CollectionReference users = FirebaseFirestore.instance.collection('users');
 
     return Scaffold(
       backgroundColor: const Color(0xFFD76446),

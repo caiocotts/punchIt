@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:punch_it/group_info_screen.dart';
 
 class JoinedGroups extends StatefulWidget {
   const JoinedGroups({Key? key}) : super(key: key);
@@ -10,9 +11,14 @@ class JoinedGroups extends StatefulWidget {
 }
 
 class _JoinedGroupsState extends State<JoinedGroups> {
-  List<String> documentNames = ["control", "group2", "test"];
+  var db = FirebaseFirestore.instance;
+  late Future<List<String>> documentNames;
 
-  // CollectionReference users = FirebaseFirestore.instance.collection('users');
+  @override
+  void initState() {
+    super.initState();
+    documentNames = getGroupNames();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +27,30 @@ class _JoinedGroupsState extends State<JoinedGroups> {
       body: SafeArea(
         child: Column(
           children: [
-            ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: documentNames.length,
-                itemBuilder: (context, index) {
-                  getGroupNames();
-                  return Text(documentNames[index]);
+            FutureBuilder(
+                future: documentNames,
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (context, index) {
+                          return Builder(builder: (context) {
+                            return TextButton(
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) {
+                                  return GroupInfo(snapshot.data[index]);
+                                }),
+                              ),
+                              child: Text(snapshot.data[index]),
+                            );
+                          });
+                        });
+                  } else {
+                    return const Text("retrieving groups...");
+                  }
                 }),
           ],
         ),
@@ -35,11 +58,20 @@ class _JoinedGroupsState extends State<JoinedGroups> {
     );
   }
 
-  Future getGroupNames() async {
-    var id = FirebaseAuth.instance.currentUser?.uid;
-    var docSnapshot = await FirebaseFirestore.instance
-        .collection('users/$id/groups')
+  Future<List<String>> getGroupNames() async {
+    final id = FirebaseAuth.instance.currentUser?.uid;
+    var junctionSnapshot = await db
+        .collection('junction_user_group')
+        .where('uid', isEqualTo: id)
         .get();
-    print(docSnapshot.docs.map((e) => e.data()));
+
+    return Stream.fromFutures(
+      junctionSnapshot.docs.map((e) async {
+        var groupId = e.data()['groupId'];
+        DocumentSnapshot documentSnapshot =
+            await db.collection('groups').doc(groupId).get();
+        return documentSnapshot['name'] as String;
+      }),
+    ).toList();
   }
 }
