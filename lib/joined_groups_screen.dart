@@ -44,7 +44,15 @@ class _JoinedGroupsState extends State<JoinedGroups> {
                                   return GroupInfo(snapshot.data[index]);
                                 }),
                               ),
-                              child: Text(snapshot.data[index]),
+                              child: Text(
+                                snapshot.data[index],
+                                style: const TextStyle(
+                                  fontSize: 30,
+                                ),
+                              ),
+                              style: TextButton.styleFrom(
+                                primary: Colors.black,
+                              ),
                             );
                           });
                         });
@@ -59,10 +67,10 @@ class _JoinedGroupsState extends State<JoinedGroups> {
   }
 
   Future<List<String>> getGroupNames() async {
-    final id = FirebaseAuth.instance.currentUser?.uid;
+    final email = FirebaseAuth.instance.currentUser?.email;
     var junctionSnapshot = await db
         .collection('junction_user_group')
-        .where('uid', isEqualTo: id)
+        .where('email', isEqualTo: email)
         .get();
 
     return Stream.fromFutures(

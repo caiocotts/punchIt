@@ -32,6 +32,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 textInputAction: TextInputAction.next,
               ),
             ),
+            const SizedBox(
+              height: 15,
+            ),
             Padding(
               padding: const EdgeInsets.only(right: 20, left: 20),
               child: TextField(
@@ -44,6 +47,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 textInputAction: TextInputAction.next,
               ),
             ),
+            const SizedBox(
+              height: 15,
+            ),
             Padding(
               padding: const EdgeInsets.only(right: 20, left: 20),
               child: TextField(
@@ -54,6 +60,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   labelText: "Re-enter Password",
                 ),
               ),
+            ),
+            const SizedBox(
+              height: 15,
             ),
             Builder(builder: (context) {
               return TextButton(
@@ -84,9 +93,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   }
                   FirebaseFirestore.instance
                       .collection("users")
-                      .doc(user?.uid)
+                      .doc(user?.email)
                       .set({
-                    "email": user?.email,
+                    "uid": user?.uid,
                   }).catchError((e) {
                     SnackBar snackBar = SnackBar(
                       content: Text(
@@ -98,10 +107,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     setState(() {});
                     return;
                   });
+                  if (user != null && !user.emailVerified) {
+                    await user.sendEmailVerification();
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const LoginScreen(),
+                      builder: (_) {
+
+                        return const LoginScreen();
+                      },
                     ),
                   );
                 },

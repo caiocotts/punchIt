@@ -14,8 +14,6 @@ class _CreateGroupState extends State<CreateGroup> {
   String newGroupName = '', groupDescription = '';
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-  // late DocumentReference groupInfo;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,13 +21,21 @@ class _CreateGroupState extends State<CreateGroup> {
       body: SafeArea(
         child: Column(
           children: [
-            TextField(
-              onChanged: (value) => newGroupName = value,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "Group Name",
+            Image.asset(
+              'assets/pencil.png',
+              height: 250,
+              width: 250,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              child: TextField(
+                onChanged: (value) => newGroupName = value,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Group Name",
+                ),
+                textInputAction: TextInputAction.next,
               ),
-              textInputAction: TextInputAction.next,
             ),
             Builder(builder: (context) {
               return TextButton(
@@ -39,15 +45,15 @@ class _CreateGroupState extends State<CreateGroup> {
                       .add({
                     "name": newGroupName,
                   });
-                  String? uid = auth.currentUser?.uid;
+                  String? email = auth.currentUser?.email;
                   FirebaseFirestore.instance
                       .collection("junction_user_group")
-                      .doc(uid! + docRef.id)
+                      .doc(email! + docRef.id)
                       .set({
                     "groupId": docRef.id,
-                    "uid": uid,
+                    "email": email,
                   }).then(
-                        (_) {
+                    (_) {
                       return Navigator.push(
                         context,
                         MaterialPageRoute(

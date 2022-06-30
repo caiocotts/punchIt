@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:punch_it/forgot_password_screen.dart';
 import 'package:punch_it/registration_screen.dart';
 import 'home_screen.dart';
 
@@ -11,7 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  late String password = '07480748', email = 'caio@cotts.com.br';
+  late String password = '', email = '';
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Center(
                       child: Image.asset(
-                        'assets/PunchIt.png',
+                        'assets/punchIt.png',
                         height: 300,
                         width: 300,
                       ),
@@ -75,15 +76,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     Builder(builder: (context) {
                       return TextButton(
                         onPressed: () async {
+
                           try {
                             await FirebaseAuth.instance
                                 .signInWithEmailAndPassword(
                                     email: email, password: password);
+
                           } on FirebaseAuthException catch (e) {
                             SnackBar snackBar = SnackBar(
                               content: Text(
                                 e.toString().replaceAll(RegExp(r'\[.*\]'), ''),
                               ),
+                              backgroundColor: Colors.redAccent,
+                            );
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                            setState(() {});
+                            return;
+                          }
+                          User? user = FirebaseAuth.instance.currentUser;
+
+                          if (user != null && !user.emailVerified) {
+                            SnackBar snackBar = const SnackBar(
+                              content: Text("Check email to verify account"),
                               backgroundColor: Colors.redAccent,
                             );
                             ScaffoldMessenger.of(context)
@@ -119,7 +134,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 Builder(builder: (context) {
                                   return TextButton(
-                                    onPressed: null,
+                                    onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const ForgotPasswordScreen(),
+                                      ),
+                                    ),
                                     child: const Text("Forgot Password?"),
                                     style: TextButton.styleFrom(
                                       primary: Colors.black,
