@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:punch_it/Screens/home_screen.dart';
-import 'package:punch_it/Theme/app_colors.dart';
-import 'package:punch_it/Repositories/user_repository.dart';
-import 'package:punch_it/Models/user.dart' as punch_it;
+import 'package:punch_it/screens/forgot_password_screen.dart';
+import 'package:punch_it/screens/home_screen.dart';
+import 'package:punch_it/screens/registration_screen.dart';
+import 'package:punch_it/theme/app_theme.dart';
+import 'package:punch_it/repositories/user_repository.dart';
+import 'package:punch_it/models/user.dart' as punch_it;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -12,25 +14,22 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  late String password = '', email = '';
+  String _password = '', _email = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: AppColours.backgroundRed,
+      backgroundColor: AppTheme.backgroundRed,
       body: CustomScrollView(slivers: [
         SliverFillRemaining(
           hasScrollBody: false,
           child: SafeArea(
             child: Column(children: [
-              const Image(
-                alignment: Alignment.topCenter,
+              Image.asset(
+                'assets/punchIt.png',
                 height: 300,
                 width: 300,
-                image: AssetImage(
-                  'assets/punchIt.png',
-                ),
               ),
               const Text(
                 'Punch It!',
@@ -48,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     TextField(
-                      onChanged: (value) => email = value,
+                      onChanged: (value) => _email = value,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Email',
@@ -59,7 +58,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 15,
                     ),
                     TextField(
-                      onChanged: (value) => password = value,
+                      onChanged: (value) => _password = value,
+                      obscureText: true,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Password',
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     UserRepository userRepo = UserRepository.getInstance();
                     var user = punch_it.User();
                     try {
-                      user = await userRepo.authenticateUser(email, password);
+                      user = await userRepo.authenticateUser(_email, _password);
                     } on Exception catch (e) {
                       SnackBar snackBar = SnackBar(
                         content: Text(
@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const HomeScreen(),
+                                builder: (_) => const ForgotPasswordScreen(),
                               ),
                             ),
                             child: const Text("Forgot Password?"),
@@ -153,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const HomeScreen(),
+                              builder: (_) => const RegistrationScreen(),
                             ),
                           ),
                           child: const Text("Sign Up"),

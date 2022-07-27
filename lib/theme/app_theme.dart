@@ -1,5 +1,5 @@
 import 'dart:ui';
 
-class AppColours {
+class AppTheme {
   static const backgroundRed = Color(0xFFD76446);
 }

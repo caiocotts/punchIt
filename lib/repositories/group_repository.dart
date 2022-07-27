@@ -1,0 +1,55 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:punch_it/repositories/user_repository.dart';
+
+import 'package:punch_it/models/group.dart';
+
+class GroupRepository {
+  static GroupRepository? _instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  static GroupRepository getInstance() {
+    _instance ??= GroupRepository();
+    return _instance!;
+  }
+
+  Future<Group> createGroup(String groupName) async {
+    Group group = Group();
+    await _firestore.collection('groups').add({
+      'name': groupName,
+    }).then((groupRef) async {
+      group.name = groupName;
+      group.id = groupRef.id;
+      await inviteUserToGroup(group, UserRepository.getInstance().getUser().email!);
+    });
+    return group;
+  }
+
+  Future<Group> inviteUserToGroup(Group group, String userEmail) async {
+    await _firestore
+        .collection('junction_user_group')
+        .doc(userEmail + group.id!)
+        .set({
+      'groupId': group.id,
+      'email': userEmail,
+    });
+    return group;
+  }
+
+  Future<List<Group>> getGroupNames(String userEmail) async {
+    var junctionSnapshot = await _firestore
+        .collection('junction_user_group')
+        .where('email', isEqualTo: userEmail)
+        .get();
+
+    return Stream.fromFutures(
+      junctionSnapshot.docs.map((e) async {
+        Group group = Group();
+        group.id = e.data()['groupId'];
+        var documentSnapshot =
+            await _firestore.collection('groups').doc(group.id).get();
+        group.name = documentSnapshot['name'] as String;
+        return group;
+      }),
+    ).toList();
+  }
+}

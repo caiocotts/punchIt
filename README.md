@@ -1,4 +1,4 @@
-# punch_it
+# Punch It
 
 A new Flutter project.
 
