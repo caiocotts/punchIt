@@ -78,6 +78,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       setState(() {});
                       return;
                     }
+                    if (!mounted) return;
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) {
@@ -85,11 +86,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       }),
                     );
                   },
-                  child: const Text('Sign Up'),
                   style: TextButton.styleFrom(
                     primary: Colors.black,
                     backgroundColor: Colors.grey,
                   ),
+                  child: const Text('Sign Up'),
                 );
               })
             ]),

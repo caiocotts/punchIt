@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:punch_it/repositories/user_repository.dart';
 import 'package:punch_it/screens/create_group_screen.dart';
 import 'package:punch_it/screens/joined_groups_screen.dart';
 import 'package:punch_it/theme/app_theme.dart';
+import 'package:sizer/sizer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -12,6 +14,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late String punchPressure = '';
+
+  @override
+  void initState() {
+    super.initState();
+    Timer.periodic(const Duration(seconds: 1), (Timer t) => setState(() {}));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,32 +30,33 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(children: [
           Image.asset(
             'assets/punchingBag.png',
-            height: 256,
-            width: 256,
+            height: 35.h,
+            width: 60.w,
           ),
-          const Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(top: 40),
-              child: Text(
-                "Sensor Reading",
-                style: TextStyle(
-                  fontSize: 50,
-                  fontFamily: 'FiraSans',
-                ),
+          Padding(
+            padding: const EdgeInsets.only(top: 40),
+            child: Text(
+              "Sensor Reading",
+              style: TextStyle(
+                fontSize: 13.w,
+                fontFamily: 'FiraSans',
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 160),
-            child: Center(
-              child: Text(
-                "42",
-                style: TextStyle(
-                  fontSize: 40,
-                  fontFamily: 'FiraSans',
-                ),
-              ),
-            ),
+          Expanded(
+            child: FutureBuilder(
+                initialData: 'Loading...',
+                future: UserRepository.getInstance().updateHighScore(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<String?> pressure) {
+                  return Text(
+                    pressure.data!,
+                    style: TextStyle(
+                      fontSize: 20.w,
+                      fontFamily: 'FiraSans',
+                    ),
+                  );
+                }),
           ),
           Row(children: [
             Builder(builder: (context) {
@@ -58,10 +69,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (_) => const CreateGroupScreen(),
                     ),
                   ),
-                  child: const Text("Create a Group"),
                   style: TextButton.styleFrom(
                     primary: Colors.black,
                   ),
+                  child: const Text("Create a Group"),
                 ),
               );
             }),
@@ -83,11 +94,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   },
-                  child: const Text(
-                    "Joined Groups",
-                  ),
                   style: TextButton.styleFrom(
                     primary: Colors.black,
+                  ),
+                  child: const Text(
+                    "Joined Groups",
                   ),
                 ),
               );

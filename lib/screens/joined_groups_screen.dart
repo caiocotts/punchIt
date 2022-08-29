@@ -43,14 +43,14 @@ class _JoinedGroupsScreenState extends State<JoinedGroupsScreen> {
                                   );
                                 }),
                               ),
+                              style: TextButton.styleFrom(
+                                primary: Colors.black,
+                              ),
                               child: Text(
                                 groups.data![index].name as String,
                                 style: const TextStyle(
                                   fontSize: 30,
                                 ),
-                              ),
-                              style: TextButton.styleFrom(
-                                primary: Colors.black,
                               ),
                             );
                           });

@@ -42,7 +42,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   GroupRepository groupRepo = GroupRepository.getInstance();
                   try {
                     await groupRepo.createGroup(groupName);
-                     Navigator.push(
+                    if (!mounted) return;
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const HomeScreen(),

@@ -2,10 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:punch_it/models/user.dart' as punch_it;
+import 'package:punch_it/repositories/punch_bag_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserRepository {
   static UserRepository? _instance;
   final FirebaseAuth _firebase = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static UserRepository getInstance() {
     _instance ??= UserRepository();
@@ -43,12 +46,31 @@ class UserRepository {
       return usr;
     });
 
-    FirebaseFirestore.instance
+    _firestore.collection('users').doc(usr.email).set({'uid': usr.uid}).then(
+        (_) => _firebase.currentUser?.sendEmailVerification());
+    return usr;
+  }
+
+  Future<String?> updateHighScore() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String? strPressure =
+        await PunchBagRepository.getInstance().getPressureReading();
+
+    int iPressure = int.parse(strPressure!);
+
+    if (prefs.getInt('highscore') == null ||
+        iPressure > prefs.getInt('highscore')!) {
+      prefs.setInt('highscore', iPressure);
+    }
+
+    punch_it.User usr = UserRepository.getInstance().getUser();
+
+    _firestore
         .collection('users')
         .doc(usr.email)
-        .set({'uid': usr.uid}).then(
-      (_) => _firebase.currentUser?.sendEmailVerification(),
-    );
-    return usr;
+        .update({'highscore': prefs.getInt('highscore')});
+
+    return prefs.getInt('highscore').toString();
   }
 }

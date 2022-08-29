@@ -1,4 +1,4 @@
 class Group {
-   String? name;
-   String? id ;
+  String? name;
+  String? id;
 }

@@ -51,6 +51,7 @@ class _InviteUserScreenState extends State<InviteUserScreen> {
                     setState(() {});
                     return;
                   }
+                  if (!mounted) return;
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) {
